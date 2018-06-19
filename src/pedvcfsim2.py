@@ -53,8 +53,8 @@ def main():
     else:
         num_cols = 5
         with open (args.input, 'r') as pedin:
-            if all(col.count('\t') != num_cols-1 for col in pedin):
-                print("\t",args.input,"does not contain 6 tabbed columns. Exiting...")
+            if all(col.count('\t') < num_cols-1 for col in pedin):
+                print("\t",args.input,"should contain 5 tabbed columns at least. Exiting...")
                 sys.exit()
             else:
                 print( args.input,"is tab separated. Proceeding!")
@@ -193,6 +193,8 @@ def main():
                     else:
                         pass
                     adflags.append(rest)
+                for i in adflags:
+                    [i.remove(x) for x in i if x== None]
 #                l = [str(a).replace(' ','') for a in adflags]
                 ddadcount = list(zip(ddcode,[str(a).replace(' ','') for a in adflags]))
                 merged_ads_and_codes =[]
@@ -217,7 +219,7 @@ def main():
                 gtad_soma = '\t'.join(g_soma)
                 last_gtad = "\t".join([gtad_soma, gtad_maps])
 #                print(gtad_soma)
-#                print(reference, alt, last_gtad)
+                print(reference, alt, last_gtad)
                 f.write("%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n"%(str(counter), str(count),str("."),
                                     reference, alt,str("."),str("PASS"),str("."),str("GT"+":AD"),str(last_gtad)))
                 

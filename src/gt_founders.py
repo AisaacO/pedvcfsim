@@ -33,17 +33,17 @@ def run(df,bases, theta,mutnode,mutate):
                             mut_allele = random.choices(allele)
                             for key, val in ld.items():
                                 change_node_val = val[0][0]
-                            values = [*mut_allele, change_node_val]
-                            mutated_node = {key: [values]}
-                            node_dict.update(mutated_node)
+                                values = [*mut_allele, change_node_val]
+                                mutated_node = {key: [values]}
+                                node_dict.update(mutated_node)
                         if mutate == 2 and bas != mutate_this2:
                             allele2.append(bas)
                             mut_allele = random.choices(allele2)
                             for key, val in ld.items():
                                 change_node_val = val[1][0]
-                            values = [change_node_val, *mut_allele]
-                            mutated_node = {key: [values]}
-                            node_dict.update(mutated_node)
+                                values = [change_node_val, *mut_allele]
+                                mutated_node = {key: [values]}
+                                node_dict.update(mutated_node)
         node_values.update(node_dict)
         ld = gt.third(lc)
         for x , v in ld.items():
