@@ -1,8 +1,19 @@
 # pedvcfsim
-Simulation of Meiosis and vcf file from pedigree data using a finite table Chinese restaurant process.
+Simulate vcf file from pedigree data using a finite table Chinese restaurant process.
 
 ----
+The simulation follows a descrete time stochastic finite mixture model similar to seating customers in a Chinese restaurant. The application restricts tables in the process to 4 corresponding to the bases ```'A', 'G', 'C', 'T'.``` 
 
+
+---------------------------------------
+# Getting Started
+---------------------------------------
+
+This README should get you started with your Simulation
+
+License information can be found in the accompanying LICENSE file.
+
+----
 The script requires a pedigree file with 6 columns to simulate a variant call file with mutations at a user specified site. The simulation follows a descrete time stochastic finite mixture model similar to seating customers in a Chinese restaurant. The application restricts tables in the process to 4 corresponding to the bases ```'A', 'G', 'C', 'T'.``` 
 
 pedtovcfsim requires python version 3+, it is simple to use and only requires python base modules.
