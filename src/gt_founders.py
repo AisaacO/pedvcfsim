@@ -44,9 +44,13 @@ def run(df,bases, theta,mutnode,mutate):
                                 values = [change_node_val, *mut_allele]
                                 mutated_node = {key: [values]}
                                 node_dict.update(mutated_node)
-        node_values.update(node_dict)
-        ld = gt.third(lc)
-        for x , v in ld.items():
+        node_values.update(node_dict)        
+        le = gt.third(lc)
+#        print(le)
+        for keys in le.keys():
+            if keys not in node_values:
+                node_values.update(le)
+        for x , v in node_values.items():
             ldd = [i for sub in v for i in sub]
         newdict = {x:[ldd]}
         node_values.update(newdict)
