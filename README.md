@@ -18,7 +18,7 @@ The simulation follows a descrete time stochastic finite mixture model similar t
 
 ---------------------------------------
 # Getting Started
----------------------------------------
+
 
 This README should help get you started with your Simulation
 
@@ -26,20 +26,16 @@ License information can be found in the accompanying LICENSE file.
 
 pedvcfsim requires python version 3+, it is simple to use and only requires python base modules.
 
-##### Installation
-To use pedvcfsim, you can either clone or download it:
+### Installation
+To use pedvcfsim, you can either clone or download by using the links above or click below:
 
 
-Copy and paste 
-
-
-* [Clone](http://www.dropwizard.io/1.0.2/docs/) - The web framework used
-* [Download](https://maven.apache.org/) - Dependency Management
-* [ROME](https://rometools.github.io/rome/) - Used to generate RSS Feeds
+* [Clone](git@github.com:AisaacO/pedvcfsim.git) 
+* [Download](https://github.com/AisaacO/pedvcfsim/archive/master.zip)
 
 ----
 
-##### Pedigree File Format
+### Pedigree File Format
 
 ```pedtovcfsim``` requires a 5-column, tab-separated pedigree file format as input
 ```
@@ -48,17 +44,16 @@ I_ID	F	M	S	S_ID
 2   0   0   2   Sample2
 3   1   2   2   Sample3
 ```
-F_ID = Family ID
 
-I_ID = Individual ID
+First Column  = Individual ID
 
-F = Father ID
+Second Column = Father ID
 
-M = Mother ID
+Third column = Mother ID
 
-S = Sex
+Fourth column = Sex
 
-S_ID = Sample ID
+Fifth column = Sample ID
 
 ----
 
