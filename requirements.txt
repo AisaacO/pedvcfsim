@@ -1,0 +1,8 @@
+pandas
+numpy
+morph
+argparse
+random
+itertools
+csv
+time
