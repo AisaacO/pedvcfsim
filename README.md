@@ -1,7 +1,7 @@
 <p align="center"><img width=12.5% src="https://github.com/AisaacO/pedvcfsim/blob/master/images/logo.png"></p>
 <p align="center"><img width=40% height=5% src="https://github.com/AisaacO/pedvcfsim/blob/master/images/words.png"></p>
-Simulate vcf file from pedigree data using a finite table Chinese restaurant process.
-The simulation follows a descrete time stochastic finite mixture model similar to seating customers in a Chinese restaurant. The application restricts tables in the process to 4 corresponding to the bases ```'A', 'G', 'C', 'T'.``` 
+Simulate Variant Call Format (VCF) file from pedigree or graph like data using a finite table Chinese restaurant process.
+The simulation follows a descrete time stochastic finite mixture model similar to seating customers in a Chinese restaurant. Tables in the process are restricted to 4, corresponding to the bases ```'A', 'G', 'C', 'T'.``` 
 
 
 
@@ -12,22 +12,22 @@ The simulation follows a descrete time stochastic finite mixture model similar t
 [![GitHub issues](https://img.shields.io/badge/Issues-2%20open-orange.svg)](https://github.com/AisaacO/pedvcfsim/issues)
 [![Contributions welcome](https://img.shields.io/badge/contributions-welcome-orange.svg)](https://github.com/AisaacO/pedvcfsim/blob/master/CONTRIBUTING.md)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](https://opensource.org/licenses/MIT)
-----
-
 
 
 ---------------------------------------
 # Getting Started
 ---------------------------------------
 
-This README should get you started with your Simulation
+This README should help get you started with your Simulation
 
 License information can be found in the accompanying LICENSE file. 
 
 pedvcfsim requires python version 3+, it is simple to use and only requires python base modules.
 
-##### Download
-T
+##### Installation
+To use pedvcfsim, you can either clone or download it:
+Copy and paste 
+
 
 ----
 
