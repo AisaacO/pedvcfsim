@@ -4,6 +4,8 @@ Simulate Variant Call Format (VCF) file from pedigree or graph like data using a
 The simulation follows a descrete time stochastic finite mixture model similar to seating customers in a Chinese restaurant. Tables in the process are restricted to 4, corresponding to the bases ```'A', 'G', 'C', 'T'.``` 
 
 
+----
+
 
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 ![Python](https://img.shields.io/badge/Python-v3.6%2B-blue.svg)
@@ -26,8 +28,14 @@ pedvcfsim requires python version 3+, it is simple to use and only requires pyth
 
 ##### Installation
 To use pedvcfsim, you can either clone or download it:
+
+
 Copy and paste 
 
+
+* [Clone](http://www.dropwizard.io/1.0.2/docs/) - The web framework used
+* [Download](https://maven.apache.org/) - Dependency Management
+* [ROME](https://rometools.github.io/rome/) - Used to generate RSS Feeds
 
 ----
 
