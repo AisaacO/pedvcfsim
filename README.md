@@ -10,7 +10,7 @@ The simulation follows a descrete time stochastic finite mixture model similar t
 [![Build Status](https://travis-ci.org/anfederico/Clairvoyant.svg?branch=master)](https://travis-ci.org/anfederico/Clairvoyant)
 ![Dependencies](https://img.shields.io/badge/dependencies-up%20to%20date-brightgreen.svg)
 [![GitHub issues](https://img.shields.io/badge/Issues-2%20open-orange.svg)](https://github.com/AisaacO/pedvcfsim/issues)
-![Contributions welcome](https://img.shields.io/badge/contributions-welcome-orange.svg)
+[![Contributions welcome](https://img.shields.io/badge/contributions-welcome-orange.svg)](https://github.com/AisaacO/pedvcfsim/blob/master/CONTRIBUTING.md)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 ----
 
