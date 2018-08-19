@@ -27,11 +27,10 @@ License information can be found in the accompanying LICENSE file.
 pedvcfsim requires python version 3+, it is simple to use and only requires python base modules.
 
 ### Installation
-To use pedvcfsim, you can either clone or download by using the links above or click below:
+To use pedvcfsim, you can either clone or download by:
 
-
-* [Clone](git@github.com:AisaacO/pedvcfsim.git) 
-* [Download](https://github.com/AisaacO/pedvcfsim/archive/master.zip)
+* run wget git@github.com:AisaacO/pedvcfsim.git on your local machine to clone the repo 
+* Click [Download](https://github.com/AisaacO/pedvcfsim/archive/master.zip) to download the zip folder
 
 ----
 
@@ -62,5 +61,9 @@ Fifth column = Sample ID
 python pedtovcfsim.py -i test.ped -t 0.25 -n 1 -e 0.005 -c 30 -m 3 -a 2 -s 99 -o test.vcf
 
 To get help on usage parameters, just type ```python pedvcfsim.py -h```
+
+### Contribution
+
+To contribute, please read [CONTRIBUTING.md](https://github.com/AisaacO/pedvcfsim/blob/master/CONTRIBUTING.md) for details on our code of conduct, and the process for submitting pull requests to us. 
 
 
