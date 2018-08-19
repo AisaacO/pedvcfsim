@@ -2,6 +2,4 @@ pandas
 numpy
 morph
 argparse
-itertools
 csv
-time
