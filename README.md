@@ -29,7 +29,7 @@ pedvcfsim requires python version 3+, it is simple to use and only requires pyth
 ### Installation
 To use pedvcfsim, you can either clone or download by:
 
-* running `wget git@github.com:AisaacO/pedvcfsim.git` on your local machine to clone the repo 
+* running `git clone git@github.com:AisaacO/pedvcfsim.git` on your local Linux machine to clone the repo 
 * Click [Download](https://github.com/AisaacO/pedvcfsim/archive/master.zip) to download the zip folder
 
 ----
