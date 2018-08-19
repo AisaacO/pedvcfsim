@@ -2,6 +2,7 @@
 <p align="center"><img width=40% height=5% src="https://github.com/AisaacO/pedvcfsim/blob/master/images/words.png"></p>
 Simulate vcf file from pedigree data using a finite table Chinese restaurant process.
 The simulation follows a descrete time stochastic finite mixture model similar to seating customers in a Chinese restaurant. The application restricts tables in the process to 4 corresponding to the bases ```'A', 'G', 'C', 'T'.``` 
+----
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 ![Python](https://img.shields.io/badge/python-v2.7%20%2F%20v3.6-blue.svg)
 [![Build Status](https://travis-ci.org/anfederico/Clairvoyant.svg?branch=master)](https://travis-ci.org/anfederico/Clairvoyant)
