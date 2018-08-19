@@ -62,17 +62,17 @@ python pedtovcfsim.py -i test.ped -t 0.25 -n 1 -e 0.005 -c 30 -m 3 -a 2 -s 99 -o
 
 To get help on usage parameters, just type ```python pedvcfsim.py -h```
 
-### Contribution
+### Code of Conduct
 
 To contribute, please read [CONTRIBUTING.md](https://github.com/AisaacO/pedvcfsim/blob/master/CONTRIBUTING.md) for details on our code of conduct, and the process for submitting pull requests to us. 
 
 ### Issues & bug reports
 If you have feature requests or bug reports, feel free to help out by sending pull requests or by [creating new issues](https://github.com/AisaacO/pedvcfsim/issues/new). Please take a moment to
-review the guidelines written by [Nicolas Gallagher](https://github.com/necolas):
+review the guidelines [Here](https://github.com/AisaacO/pedvcfsim/GUIDELINES.md):
 
-* [Bug reports](https://github.com/necolas/issue-guidelines/blob/master/CONTRIBUTING.md#bugs)
-* [Feature requests](https://github.com/necolas/issue-guidelines/blob/master/CONTRIBUTING.md#features)
-* [Pull requests](https://github.com/necolas/issue-guidelines/blob/master/CONTRIBUTING.md#pull-requests)
+* [Bug reports](https://github.com/AisaacO/pedvcfsim/blob/master/GUIDELINES.md#bugs)
+* [Feature requests](https://github.com/AisaacO/pedvcfsim/blob/master/GUIDELINES.md#features)
+* [Pull requests](https://github.com/AisaacO/pedvcfsim/blob/master/GUIDELINES.md#pull-requests)
 
 ## Authors
 
