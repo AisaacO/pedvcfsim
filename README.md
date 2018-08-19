@@ -1,5 +1,5 @@
 <p align="center"><img width=12.5% src="https://github.com/AisaacO/pedvcfsim/blob/master/images/logo.png"></p>
-<p align="center"><img width=40% height= 10% src="https://github.com/AisaacO/pedvcfsim/blob/master/images/words.png"></p>
+<p align="center"><img width=40% height=5% src="https://github.com/AisaacO/pedvcfsim/blob/master/images/words.png"></p>
 Simulate vcf file from pedigree data using a finite table Chinese restaurant process.
 
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
