@@ -29,7 +29,7 @@ pedvcfsim requires python version 3+, it is simple to use and only requires pyth
 ### Installation
 To use pedvcfsim, you can either clone or download by:
 
-* run wget git@github.com:AisaacO/pedvcfsim.git on your local machine to clone the repo 
+* running `git clone git@github.com:AisaacO/pedvcfsim.git` on your local Linux machine to clone the repo 
 * Click [Download](https://github.com/AisaacO/pedvcfsim/archive/master.zip) to download the zip folder
 
 ----
@@ -65,5 +65,17 @@ To get help on usage parameters, just type ```python pedvcfsim.py -h```
 ### Contribution
 
 To contribute, please read [CONTRIBUTING.md](https://github.com/AisaacO/pedvcfsim/blob/master/CONTRIBUTING.md) for details on our code of conduct, and the process for submitting pull requests to us. 
+
+### Issues & bug reports
+If you have feature requests or bug reports, feel free to help out by sending pull requests or by [creating new issues](https://github.com/AisaacO/pedvcfsim/issues/new). Please take a moment to
+review the guidelines written by [Nicolas Gallagher](https://github.com/necolas):
+
+* [Bug reports](https://github.com/necolas/issue-guidelines/blob/master/CONTRIBUTING.md#bugs)
+* [Feature requests](https://github.com/necolas/issue-guidelines/blob/master/CONTRIBUTING.md#features)
+* [Pull requests](https://github.com/necolas/issue-guidelines/blob/master/CONTRIBUTING.md#pull-requests)
+
+## Authors
+
+* **Isaac Akogwu** - *Phase I-III* - [Pedvcfsim](https://github.com/AisaacO/pedvcfsim)
 
 
