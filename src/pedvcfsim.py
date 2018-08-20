@@ -5,7 +5,6 @@ import os
 import re
 import sys
 import argparse
-import random
 import itertools
 import time
 import numpy as np
@@ -14,10 +13,6 @@ import gen_error as gn
 from gt_founders import run
 from gt_mapping2 import ggcode
 import tqdm
-import pyprog
-from time import sleep
-from tqdm import trange
-from tqdm import tqdm_notebook
 
 
 def main():
@@ -27,63 +22,17 @@ def main():
         to an output file specified by user or uses default output
     '''
     all_input = vars(args)
-    for key, value in dict(all_input).items():
-        if value is None or False:
-            del all_input[key]
-    try:
-        args.seed
-    except:
-        args.seed = int(time.time())
-    else:
-        random.seed(args.seed)
-    if sys.argv[1] == 1:
-        print(help)
-        sys.exit()
-    else:
-        print("Checking user entries...")
-        if len(sys.argv) < 6:
-            print("\t> ERROR: Incorrect number of arguments!",
-                  len(sys.argv), "! at least 6 required.")
-            print(help)
-            sys.stderr.flush()
-            sys.exit()
-        else:
-            print("Commands for this simulation includes:")
-            for arg in vars(args):
-                print("\t", arg, getattr(args, arg))
-            print("Entries >OK! Proceeding...")
-            print("Checking", args.input, "file exist...")
-    if not os.path.exists(args.input):
-        print("ERROR - File not found! Please check your path/filename")
-        sys.exit()
-    else:
-        print("File found !!! ")
-        print("Validating file contents...")
-    if os.stat(args.input).st_size == 0:
-        print("File", args.input, "is empty, please check the file!")
-        sys.exit()
-    else:
-        num_cols = 5
-        with open(args.input, 'r') as pedin:
-            if all(col.count('\t') < num_cols - 1 for col in pedin):
-                print(
-                    "\t",
-                    args.input,
-                    "should contain 5 tabbed columns at least. Exiting...")
-                sys.exit()
-            else:
-                print(args.input, "is tab separated. Proceeding!")
     n = args.num_sim
     bases = [0, 1, 2, 3]
     e = args.error_rate
     cov = args.coverage
     theta = args.theta
+    zygosity = args.zygosity
     mutate_this_node = args.mutate_node
     mutnode = []
-    try:
-        args.zygosity
-    except:
-        args.zygosity = None
+    for key, value in dict(all_input).items():
+        if value is None or False:
+            del all_input[key]
     mutate = args.mut_allele
     readers = pf.read_csv(args.input)
     rowss = [["0" if x == "." else x for x in row] for row in list(readers)]
@@ -91,49 +40,40 @@ def main():
     file_exclude_header = [row for row in rowss[2:]]
     sites_lists = [row[:3] for row in file_exclude_header]
     sample_lists = [row[4:] for row in file_exclude_header]
-#    print(sites_lists, "...", sample_lists)
     try:
         individuals = [i[0] for i in sites_lists]
     except IndexError:
         individuals = [i for i in sites_lists]
     num_sites = list(range(1, len(sites_lists) + 1))
 #    print(num_sites)
-    lx = {
+    ind_index_dict = {
         l1: l2 for l1,
         l2 in itertools.zip_longest(
             individuals,
             num_sites,
             fillvalue=None)}
-#    print(lx)
     str_sites = []
     for items in sites_lists:
         ind_sites = []
         for item in items:
-            if item in lx.keys():
-                ind_sites.append(lx[item])
+            if item in ind_index_dict.keys():
+                ind_sites.append(ind_index_dict[item])
             else:
                 ind_sites.append(item)
         str_sites.append(ind_sites)
-#    print(str_sites)
     sites = ([[int(j) for j in i] for i in str_sites])
-#    print(sites)
     for index, ind in enumerate(sites_lists):
         if mutate_this_node in ind:
-            mutnode = index +1
-#    print(mutnode)
-            
+            mutnode = index +1       
     sam_name = individuals
     sample_gl = [str(s) for s in sam_name]
     sample_lb = [s for s in sample_lists]
     sam_name = sample_gl + sample_lb
-#    print(sam_name)
     sam_list = pf.removebrackets(sam_name)
     sample_names = (sam_list.replace(", ", "\t")).translate(
         str.maketrans({"'": None}))
-#    print(sample_names)
     input_data = [tuple(l) for l in sites]
     cNodes = list((i[0] for i in input_data if 0 not in i))
-#    print(cNodes)
     if mutnode not in cNodes:
         print(
             "Node",
@@ -149,7 +89,7 @@ def main():
             l2 = "##phasing=partial"
             l3 = "##contig=<ID=1,length = " + str(args.num_sim) + ">"
             l4 = "##vcfsimCommands = -i " + str(args.input) + " -t " + str(args.theta) + " -n " + str(args.num_sim) + " -e " + str(args.error_rate) + " -c " + str(
-                args.coverage) + " -m " + str(args.mutate_node) + " -a " + str(args.mut_allele) + " -z " + str(args.zygosity) + " -s " + str(args.seed) + " -o " + str(args.output)
+                args.coverage) + " -m " + str(args.mutate_node) + " -a " + str(args.mut_allele) + " -z " + str(zygosity) + " -s " + str(args.seed) + " -o " + str(args.output)
             l5 = "##FILTER=<ID=PASS,Description = "'"All filters passed"'" > "
             l6 = "##FORMAT=<ID=GT,Number = 1,Type=String,Description = "'"Genotype"'" > "
             l7 = "##FORMAT=<ID=AD,Number = R,Type=Integer,Description = "'"Allelic depths for the ref and alt alleles in the order listed"'">"
@@ -162,78 +102,65 @@ def main():
             counter = 1
             count = 0
             for x in tqdm.tqdm(range(n), total=len(range(n))):
-#                for x in range(n):
-    #                s =  ((x/5000)*'#')+str(x)+(' %')
-    #                print ('\r'+s)
-    #                for i in tqdm.tqdm(range(1)):
                 count += 1
                 # get values from the function (run)
                 ref, node_values, coding = run(
                     input_data, bases, theta, mutnode, mutate)
-#                print(node_values, coding)
+                '''
+                    check if zygosity is given and if value = 1, the genotypes of the individuals
+                    will be the same (always conforms to mutated node if its one of the monozygote
+                    twins). If value = 2, the genotypes are different (treated as different individuals).
+                '''
                 try:
                     if args.zygosity:
                         zygo = [item for s in args.zygosity for item in s]
-#                        print(zygo)
                         for i, j in enumerate(node_values.keys()):
                             for k, x in enumerate(individuals):
-#                                print(k,x, i, j)
                                 if k ==i and x == zygo[2] and k == mutnode and zygo[0] == str(1):                                    
                                     node_values[k + 1] = node_values.get(mutnode)
                                     cod = dict(enumerate(coding))
-#                                    print(cod)
                                     for q, s in enumerate(coding):
-#                                        print(q, s, k, x)
                                         if q == k:
-                                            coding[q] = cod.get(q-1)
-#                                            print(coding)                                            
+                                            coding[q] = cod.get(q-1)                                           
                                 if zygo[0] == str(2):
                                     pass
                 except:
-                    pass
-#                print(node_values)    
+                    pass    
                 alt, code, inner_node = ggcode(node_values, ref)
                 readers = pf.read_csv(args.input)
                 rowss = list(readers)
-#                headers = rowss[0]
-                rest = [row for row in rowss[0:]]
-#                print(rest)
-                year = dict()
-                for i in rest:
+                rowss_as_strings = [row for row in rowss[0:]]
+                rowss_dict = dict()
+                for i in rowss_as_strings:
                     key = i[0]
                     val = i[4:]
-                    year[key] = val
-                if 'I' in year:
-                    del year['I']
-                for key, val in year.items():
+                    rowss_dict[key] = val
+                for key, val in rowss_dict.items():
                     for i, x in enumerate(coding):
                         if key == i + 1:
-                            year[key] = [x for y in val]
+                            rowss_dict[key] = [x for y in val]
                 inner_dict = dict()
-                for k, v in year.items():
+                for k, v in rowss_dict.items():
                     for i in v:
-                        i = i.replace(i, "1")
-                        inner_dict[k] = [i for y in v]
-                vz = []
+                        inner_dict[k] = [i.replace(i, "1") for y in v]
+                all_ones_val = []
                 for x in inner_dict.values():
-                    vz.append(x)
-                results = [[int(j) for j in i] for i in vz]
-                ddk = ["0"] * len(results)
-                ddad = list(zip(ddk, [str(a).replace(' ', '')
-                                      for a in results]))
-                final = []
-                for i in ddad:
-                    final.extend([i[0], (i[1]).strip("[]")])
-                xx = [":".join(final[i:i + 2])
-                      for i in range(0, len(final), 2)]
-                soma = [x.replace('1', '.') for x in xx]
+                    all_ones_val.append(x)
+                code_results = [[int(j) for j in i] for i in all_ones_val]
+                results = list(zip(["0"] * len(code_results), [str(a).replace(' ', '')
+                                      for a in code_results]))
+                final_results = []
+                for i in results:
+                    final_results.extend([i[0], (i[1]).strip("[]")])
+                merged_final = [":".join(final_results[i:i + 2])
+                      for i in range(0, len(final_results), 2)]
+                soma = [x.replace('1', '.') for x in merged_final]
                 soma = [x.replace('0', '') for x in soma]
                 ref_val = pf.convert_to_string(ref)
                 ref_string = pf.removebrackets(ref_val)
                 reference = str(ref_string)
                 het, hom = gn.gen_err(e)
                 final_vals_based_on_error = []
-#                print(coding)
                 calculated_error_rates = []
                 for i in coding:
                     if i not in het.index:
@@ -270,48 +197,35 @@ def main():
                 refalt = []
                 refalt.append(reference)
                 refalt.extend(alt.split(","))
-                keysss = []
+                ads_and_errors = []
                 for i in ad_dict:
                     l = [i.setdefault(key, 0) for key in refalt]
                     for k, v in i.items():
                         if k not in refalt and v > 0:
                             refalt.append(k)
                             l.append(v)
-                    keysss.append(l)
-                keyssss = keysss
-#                print(keysss)
-                for x in keysss:
+                    ads_and_errors.append(l)
+                for x in ads_and_errors:
                     if len(x) < len(refalt):
                         x.append(0)
-                        keyssss.append(x)
+                        ads_and_errors.append(x)
                     else:
                         pass
-#                print(keyssss, "\n")
                 final_alts = ",".join(refalt[1:])
                 ddcode = re.split(r'\t+', code)
-#                print(ddcode)
                 ddadcount = list(
-                    zip(ddcode, [str(a).replace(' ', '') for a in keyssss]))
-#                print(ddadcount)
+                    zip(ddcode, [str(a).replace(' ', '') for a in ads_and_errors]))
                 merged_ads_and_codes = []
                 for i in ddadcount:
                     merged_ads_and_codes.extend([i[0], (i[1]).strip("[]")])
                 mappings = [":".join(merged_ads_and_codes[i:i + 2])
                             for i in range(0, len(merged_ads_and_codes), 2)]
-#                print(mappings)
-#                print(sample_lists, individuals)
                 gtad_maps = '\t'.join(mappings)
                 list_range = list(map(str, range(1, 5)))
-#                print(ddcode)
                 new_code = [[[('0' if b in list_range else b) for b in x]
                              for x in ddcode] for a in list_range]
-#                print(new_code, "\n")
                 dcode = new_code[0]
-#                print(dcode)
                 lo = ["".join(i) for i in dcode]
-#                print(soma)
-#                print(mappings)
-#                print(coding)
                 try:
                     args.zygosity
 #                    try:
@@ -342,14 +256,11 @@ def main():
                                                         pass
                                                 if zygo[0] == str(2):
                                                     pass
-                        #                    print(twin_dict2)
                                             mapmaps = list(twin_dict2.values())
                                             for p, q in enumerate(mapmaps):
                                                 for r, s in enumerate(mappings):
                                                     if p == x and p == r:
                                                         mapmaps[x] = q.replace(q,s)
-    #                        print(mapmaps)
-    #                        print(list(mapmaps))
                         gtad_maps = '\t'.join(mapmaps)
                         gtad_soma = '\t'.join(g_soma)
                     else:
@@ -372,18 +283,9 @@ def main():
                 gtad_soma = '\t'.join(g_soma)
 #                print(gtad_soma, gtad_maps)
                 last_gtad = "\t".join([gtad_soma, gtad_maps])
-#                print(last_gtad)
-#                sleep(0.1)
-#    # Set current status
-#                prog.set_stat(x + 1)
-#    # Update Progress Bar again
-#                prog.update()
                 f.write("%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n" % (str(counter), str(count), str("."),
                                                                   reference, final_alts, str("."), str("PASS"), str("."), str("GT" + " :AD"), str(last_gtad)))
-                pass#time.sleep(0.01)
-#            prog.end()
-##                for i in tqdm.tqdm(range(1)):
-##                    time.sleep(0.01)
+                pass
         print("Results have been written to ", args.output)
 
 
@@ -397,7 +299,7 @@ if __name__ == '__main__':
 #    print("\tBegin \033[0;34mvcfsim.py\033[0;m(v0.0.1)")
     print("\tBegin \033[0;33mvcfsim.py\033[0;m(v0.0.1)")
 #    \x1b[1,33m
-    print("\tLast updated: May 03, 2018.")
+    print("\tLast updated: August 19, 2018.")
     print("\tRequires running python 3!\n")
     print("*******************************************")
     examples = '''example:
@@ -420,8 +322,6 @@ if __name__ == '__main__':
                                 help='Error rate in simulation', required=False)
     required.add_argument('-c', '--coverage', type=int, nargs=2,
                                 help='Coverage of sequences', required=False)
-    optional.add_argument('-z', '--zygosity', action='append',nargs=3, metavar=('zygosity','twin1','twin2'),
-                                help='Specifies zygosity of twin children if any. 1 for Monozygotic or 2 for Dizygotic [default: %(default)s]', required=False)
     optional.add_argument('-a', '--mut_allele', type=int, choices=range(1, 3), default=2,
                                 help='Mutate allele in child node. 1 for Paternal or 2 for maternal allele [default: %(default)s]', required=False)
     optional.add_argument('-o', '--output', type=pf.valid_output,
@@ -436,10 +336,56 @@ if __name__ == '__main__':
                                 help='Increased simulation verbosity', required=False)
     optional.add_argument('-s', '--seed', type=int, dest="seed",
                                 help='Random seed for simulation run', required=False)
+    optional.add_argument('-z', '--zygosity', action='append',nargs=3,
+                                help='Specifies zygosity of twin children if any. 1 for Monozygotic or 2 for Dizygotic [default: %(default)s]', required=False)
     parser._action_groups.append(optional)
-
     try:
         args = parser.parse_args()
+        if not args.seed:
+            args.seed = int(time.time())
+        else:
+            args.seed
+        if sys.argv[1] == 1:
+            print(help)
+            sys.exit()
+        else:
+            print("Checking user entries...")
+            if len(sys.argv) < 6:
+                print("\t> ERROR: Incorrect number of arguments!",
+                      len(sys.argv), "! at least 6 required.")
+                print(help)
+                sys.stderr.flush()
+                sys.exit()
+            else:
+                print("Commands for this simulation includes:")
+                for arg in vars(args):
+                    print("\t", arg, getattr(args, arg))
+                print("Entries >OK! Proceeding...")
+                print("Checking", args.input, "file exist...")
+        if not os.path.exists(args.input):
+            print("ERROR - File not found! Please check your path/filename")
+            sys.exit()
+        else:
+            print("File found !!! ")
+            print("Validating file contents...")
+        if os.stat(args.input).st_size == 0:
+            print("File", args.input, "is empty, please check the file!")
+            sys.exit()
+        else:
+            num_cols = 5
+            with open(args.input, 'r') as pedin:
+                if all(col.count('\t') < num_cols - 1 for col in pedin):
+                    print(
+                        "\t",
+                        args.input,
+                        "should contain 5 tabbed columns at least. Exiting...")
+                    sys.exit()
+                else:
+                    print(args.input, "is tab separated. Proceeding!")
+        if args.zygosity is not None and len(args.zygosity) not in (0, 3):
+            args.zygosity 
+        else:
+            args.zygosity = None
         main()
     except KeyboardInterrupt:
         sys.exit(1)
