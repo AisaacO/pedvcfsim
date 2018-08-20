@@ -64,13 +64,13 @@ def main():
     sites = ([[int(j) for j in i] for i in str_sites])
     for index, ind in enumerate(sites_lists):
         if mutate_this_node in ind:
-            mutnode = index +1       
+            mutnode = index + 1
     sam_name = individuals
     sample_gl = [str(s) for s in sam_name]
     sample_lb = [s for s in sample_lists]
     sam_name = sample_gl + sample_lb
     sam_list = pf.removebrackets(sam_name)
-    sample_names = (sam_list.replace(", ", "\t")).translate(
+    sname = (sam_list.replace(", ", "\t")).translate(
         str.maketrans({"'": None}))
     input_data = [tuple(l) for l in sites]
     cNodes = list((i[0] for i in input_data if 0 not in i))
@@ -88,17 +88,24 @@ def main():
             l1 = "##fileformat=VCFv4.2"
             l2 = "##phasing=partial"
             l3 = "##contig=<ID=1,length = " + str(args.num_sim) + ">"
-            l4 = "##vcfsimCommands = -i " + str(args.input) + " -t " + str(args.theta) + " -n " + str(args.num_sim) + " -e " + str(args.error_rate) + " -c " + str(
-                args.coverage) + " -m " + str(args.mutate_node) + " -a " + str(args.mut_allele) + " -z " + str(zygosity) + " -s " + str(args.seed) + " -o " + str(args.output)
+            l4 = "##vcfsimCommands = -i " + str(args.input) + " -t " + str(
+                args.theta) + " -n " + str(args.num_sim) + " -e " + str(
+                args.error_rate) + " -c " + str(
+                args.coverage) + " -m " + str(args.mutate_node) + " -a " + str(
+                args.mut_allele) + " -z " + str(zygosity) + " -s " + str(
+                args.seed) + " -o " + str(args.output)
             l5 = "##FILTER=<ID=PASS,Description = "'"All filters passed"'" > "
-            l6 = "##FORMAT=<ID=GT,Number = 1,Type=String,Description = "'"Genotype"'" > "
-            l7 = "##FORMAT=<ID=AD,Number = R,Type=Integer,Description = "'"Allelic depths for the ref and alt alleles in the order listed"'">"
+            l6 = "##FORMAT=<ID=GT,Number = 1,Type=String,Description = "
+            '"Genotype"'" > "
+            l7 = "##FORMAT=<ID=AD,Number = R,Type=Integer,Description = "
+            '"Allelic depths for the ref and alt alleles in listed order"'">"
             l8 = "##vcfsimVersion = v0.0.1"
             f.write(
                 "%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n" %
                 (l1, l2, l3, l4, l5, l6, l7, l8))
-            data_line = "#CHROM\tPOS\tID\tREF\tALT\tQUAL\tFILTER\tINFO\tFORMAT\t" + sample_names
-            f.write("%s\n" % (data_line))
+            head = (
+             "#CHROM\tPOS\tID\tREF\tALT\tQUAL\tFILTER\tINFO\tFORMAT\t" + sname)
+            f.write("%s\n" % (head))
             counter = 1
             count = 0
             for x in tqdm.tqdm(range(n), total=len(range(n))):
@@ -107,25 +114,29 @@ def main():
                 ref, node_values, coding = run(
                     input_data, bases, theta, mutnode, mutate)
                 '''
-                    check if zygosity is given and if value = 1, the genotypes of the individuals
-                    will be the same (always conforms to mutated node if its one of the monozygote
-                    twins). If value = 2, the genotypes are different (treated as different individuals).
+                    check if zygosity is given and if value = 1, the genotypes
+                    of the individuals will be the same (always conform to
+                    mutated node if its one of the monozygote
+                    twins). If value = 2, the genotypes are different (treated
+                    as different individuals).
                 '''
                 try:
                     if args.zygosity:
                         zygo = [item for s in args.zygosity for item in s]
                         for i, j in enumerate(node_values.keys()):
                             for k, x in enumerate(individuals):
-                                if k ==i and x == zygo[2] and k == mutnode and zygo[0] == str(1):                                    
-                                    node_values[k + 1] = node_values.get(mutnode)
+                                if (k == i and x == zygo[2] and
+                                        k == mutnode and zygo[0] == str(1)):
+                                    node_values[k + 1] = (
+                                            node_values.get(mutnode))
                                     cod = dict(enumerate(coding))
                                     for q, s in enumerate(coding):
                                         if q == k:
-                                            coding[q] = cod.get(q-1)                                           
+                                            coding[q] = cod.get(q-1)
                                 if zygo[0] == str(2):
                                     pass
-                except:
-                    pass    
+                except Exception:
+                    pass
                 alt, code, inner_node = ggcode(node_values, ref)
                 readers = pf.read_csv(args.input)
                 rowss = list(readers)
@@ -147,13 +158,13 @@ def main():
                 for x in inner_dict.values():
                     all_ones_val.append(x)
                 code_results = [[int(j) for j in i] for i in all_ones_val]
-                results = list(zip(["0"] * len(code_results), [str(a).replace(' ', '')
-                                      for a in code_results]))
+                results = list(zip(["0"] * len(code_results), [str(a).replace(
+                        ' ', '') for a in code_results]))
                 final_results = []
                 for i in results:
                     final_results.extend([i[0], (i[1]).strip("[]")])
-                merged_final = [":".join(final_results[i:i + 2])
-                      for i in range(0, len(final_results), 2)]
+                merged_final = [":".join(final_results[i:i + 2]) for i in
+                                range(0, len(final_results), 2)]
                 soma = [x.replace('1', '.') for x in merged_final]
                 soma = [x.replace('0', '') for x in soma]
                 ref_val = pf.convert_to_string(ref)
@@ -184,27 +195,23 @@ def main():
                 list_of_final_vals = np.array(
                     final_vals_based_on_error).tolist()
                 ad_rows = list(zip(*list_of_final_vals))
-#                print(ad_rows)
                 ad_rowws = np.array(np.array(*ad_rows)).tolist()
-#                print(ad_rowws)
                 str_bases = ["A", "G", "C", "T"]
                 ad_dict = []
                 for y, i in enumerate(ad_rowws):
                     a_dict = dict(zip(str_bases, i))
                     ad_dict.append(a_dict)
-#                ds = dict([(key,d[key]) for d in ad_dict for key in d])
-#                print(ad_dict)
                 refalt = []
                 refalt.append(reference)
                 refalt.extend(alt.split(","))
                 ads_and_errors = []
                 for i in ad_dict:
-                    l = [i.setdefault(key, 0) for key in refalt]
+                    ad_list = [i.setdefault(key, 0) for key in refalt]
                     for k, v in i.items():
                         if k not in refalt and v > 0:
                             refalt.append(k)
-                            l.append(v)
-                    ads_and_errors.append(l)
+                            ad_list.append(v)
+                    ads_and_errors.append(ad_list)
                 for x in ads_and_errors:
                     if len(x) < len(refalt):
                         x.append(0)
@@ -213,8 +220,8 @@ def main():
                         pass
                 final_alts = ",".join(refalt[1:])
                 ddcode = re.split(r'\t+', code)
-                ddadcount = list(
-                    zip(ddcode, [str(a).replace(' ', '') for a in ads_and_errors]))
+                ddadcount = list(zip(ddcode, [str(a).replace(
+                        ' ', '') for a in ads_and_errors]))
                 merged_ads_and_codes = []
                 for i in ddadcount:
                     merged_ads_and_codes.extend([i[0], (i[1]).strip("[]")])
@@ -228,39 +235,49 @@ def main():
                 lo = ["".join(i) for i in dcode]
                 try:
                     args.zygosity
-#                    try:
                     zygo = [item for s in args.zygosity for item in s]
                     if zygo[0] == str(1):
-#                        print(zygo)
                         twin_dict2 = dict(zip(individuals, mappings))
-    #                        print(twin_dict2)
                         g_soma = [x + y for x, y in zip(lo, soma)]
                         for k, v in enumerate(g_soma):
                             for s, t in enumerate(ddcode):
                                 if s == k and k == (mutnode - 1):
                                     g_soma[k] = re.sub(r'.*:', t + ":", v)
-                                    for x, y in enumerate(individuals):
-                                        if zygo[2] == y:
-                                            g_soma[x] = re.sub(r'.*:', t + ":", v)
-    #                        print(g_soma)
-                                            for i in twin_dict2.keys():
-                                                if zygo[0] == str(1):
-                            #                    print(i)
-                                                    if zygo[2] == i and zygo[1] == mutate_this_node:
-                                                        twin_dict2[i] = twin_dict2[zygo[1]]
-                                                    elif zygo[1] == i and zygo[2] == mutate_this_node:
-                                                        twin_dict2[i] = twin_dict2[zygo[2]]
-                                                    elif zygo[1] == i or zygo[2] == i and zygo[2] != mutate_this_node or zygo[1] != mutate_this_node:
-                                                        twin_dict2[i] = twin_dict2[zygo[1]]
-                                                    else:
-                                                        pass
-                                                if zygo[0] == str(2):
+                                for x, y in enumerate(individuals):
+                                    if zygo[2] == y:
+                                        g_soma[x] = re.sub(
+                                                r'.*:', t + ":", v)
+                                        for i in twin_dict2.keys():
+                                            if zygo[0] == str(1):
+                                                if (zygo[2] == i and
+                                                        zygo[1] ==
+                                                        mutate_this_node):
+                                                    twin_dict2[i] = (
+                                                        twin_dict2[zygo[1]])
+                                                elif (zygo[1] == i and
+                                                      zygo[2] ==
+                                                      mutate_this_node):
+                                                    twin_dict2[i] = (
+                                                        twin_dict2[zygo[2]])
+                                                elif (zygo[1] == i or
+                                                      zygo[2] == i and
+                                                      zygo[2] !=
+                                                      mutate_this_node or
+                                                      zygo[1] !=
+                                                      mutate_this_node):
+                                                    twin_dict2[i] = (
+                                                        twin_dict2[zygo[1]])
+                                                else:
                                                     pass
-                                            mapmaps = list(twin_dict2.values())
-                                            for p, q in enumerate(mapmaps):
-                                                for r, s in enumerate(mappings):
-                                                    if p == x and p == r:
-                                                        mapmaps[x] = q.replace(q,s)
+                                            if zygo[0] == str(2):
+                                                pass
+                                        mapmaps = list(twin_dict2.values())
+                                        for p, q in enumerate(mapmaps):
+                                            for s, t in enumerate(
+                                                    mappings):
+                                                if p == x and p == s:
+                                                    mapmaps[x] = q.replace(
+                                                                q, t)
                         gtad_maps = '\t'.join(mapmaps)
                         gtad_soma = '\t'.join(g_soma)
                     else:
@@ -271,61 +288,65 @@ def main():
                                     g_soma[k] = re.sub(r'.*:', t + ":", v)
                         gtad_maps = '\t'.join(mappings)
                         gtad_soma = '\t'.join(g_soma)
-                except:
+                except Exception:
                     g_soma = [x + y for x, y in zip(lo, soma)]
                     for k, v in enumerate(g_soma):
                         for s, t in enumerate(ddcode):
                             if s == k and k == (mutnode - 1):
                                 g_soma[k] = re.sub(r'.*:', t + ":", v)
-#                except:
-#                        g_soma = [x + y for x, y in zip(lo, soma)]
                 gtad_maps = '\t'.join(mappings)
                 gtad_soma = '\t'.join(g_soma)
-#                print(gtad_soma, gtad_maps)
                 last_gtad = "\t".join([gtad_soma, gtad_maps])
-                f.write("%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n" % (str(counter), str(count), str("."),
-                                                                  reference, final_alts, str("."), str("PASS"), str("."), str("GT" + " :AD"), str(last_gtad)))
+                f.write("%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n" % (str(
+                    counter), str(count), str("."), reference, final_alts, str(
+                        "."), str("PASS"), str("."), str("GT" + " :AD"), str(
+                                last_gtad)))
                 pass
         print("Results have been written to ", args.output)
 
 
 if __name__ == '__main__':
 
-    #    parser = argparse.ArgumentParser()
-    """ Gets input from user through command line. By using argparse, values entered are automatically
+    """ Gets input from user through command line.
+        By using argparse, values entered are automatically
         checked against the required types before simulation is started.
     """
     print("*******************************************")
-#    print("\tBegin \033[0;34mvcfsim.py\033[0;m(v0.0.1)")
-    print("\tBegin \033[0;33mvcfsim.py\033[0;m(v0.0.1)")
-#    \x1b[1,33m
+    print("\tBegin \033[0;33mpedvcfsim.py\033[0;m(v1.0.1)")
     print("\tLast updated: August 19, 2018.")
     print("\tRequires running python 3!\n")
     print("*******************************************")
     examples = '''example:
-    [python] [vcfsim.py] [input.ped] [theta] [No of simulations] [node with mutation] [output]
+    [python] [vcfsim.py] [input.ped] [theta] [No of simulations]
+    [node with mutation] [output]
     Example: vcfsim.py input.ped -t 0.001 -N 1000 -n 3 -o output.vcf'''
     parser = argparse.ArgumentParser(
-        description='Simulating meiosis and mutation in vcf format from pedigree file',
+        description='Simulating mutation from pedigree and graph-like files',
         epilog=examples, formatter_class=argparse.RawDescriptionHelpFormatter)
     optional = parser._action_groups.pop()
     required = parser.add_argument_group('required arguments')
     required.add_argument('-i', '--input', type=pf.valid_extension,
-                                help='input file in ped format. Must end with .ped', required=True)
+                          help='input file in ped format. Must end with .ped',
+                          required=True)
     required.add_argument('-t', '--theta', type=float, default=0.001,
-                                help='Controls meiosis simulation [default: %(default)3f]', required=True)
+                                help='Controls meiosis simulation'
+                                ' [default: %(default)3f]', required=True)
     required.add_argument('-n', '--num_sim', type=int, default=1000,
-                                help='Number of simulations [default: %(default)d]', required=True)
-    required.add_argument('-m', '--mutate_node', 
+                                help='Number of simulations'
+                                ' [default: %(default)d]', required=True)
+    required.add_argument('-m', '--mutate_node',
                                 help='Child node to be mutated', required=True)
     required.add_argument('-e', '--error_rate', type=float, nargs='?',
-                                help='Error rate in simulation', required=False)
+                                help='Simulation Error rate', required=False)
     required.add_argument('-c', '--coverage', type=int, nargs=2,
                                 help='Coverage of sequences', required=False)
-    optional.add_argument('-a', '--mut_allele', type=int, choices=range(1, 3), default=2,
-                                help='Mutate allele in child node. 1 for Paternal or 2 for maternal allele [default: %(default)s]', required=False)
+    optional.add_argument('-a', '--mut_allele', type=int, choices=range(1, 3),
+                          default=2, help='Mutate allele in child node. 1 for'
+                          'Paternal or 2 for maternal allele'
+                          ' [default: %(default)s]', required=False)
     optional.add_argument('-o', '--output', type=pf.valid_output,
-                                help='Output file name with vcf extension [default: %(default)s]', default="result.vcf")
+                                help='Output file name with vcf extension'
+                                '[default: %(default)s]', default="result.vcf")
     optional.add_argument(
         '-v',
         '--version',
@@ -333,11 +354,15 @@ if __name__ == '__main__':
         version='%(prog)s 2.0',
         help='output version details')
     optional.add_argument('-V', '--verbose', action="store_true",
-                                help='Increased simulation verbosity', required=False)
+                                help='Increased simulation verbosity',
+                                required=False)
     optional.add_argument('-s', '--seed', type=int, dest="seed",
-                                help='Random seed for simulation run', required=False)
-    optional.add_argument('-z', '--zygosity', action='append',nargs=3,
-                                help='Specifies zygosity of twin children if any. 1 for Monozygotic or 2 for Dizygotic [default: %(default)s]', required=False)
+                                help='Random seed for simulation run',
+                                required=False)
+    optional.add_argument('-z', '--zygosity', action='append', nargs=3,
+                                help='Specifies zygosity of twin children if'
+                                ' any. 1 for Monozygotic or 2 for Dizygotic'
+                                ' [default: %(default)s]', required=False)
     parser._action_groups.append(optional)
     try:
         args = parser.parse_args()
@@ -383,7 +408,7 @@ if __name__ == '__main__':
                 else:
                     print(args.input, "is tab separated. Proceeding!")
         if args.zygosity is not None and len(args.zygosity) not in (0, 3):
-            args.zygosity 
+            args.zygosity
         else:
             args.zygosity = None
         main()
