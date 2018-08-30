@@ -38,9 +38,10 @@ To use pedvcfsim, you can either clone or download by:
 
 ```pedtovcfsim``` requires a 5-column, tab-separated pedigree file format as input
 ```
-I_ID	F	M	S	S_ID
-1   0   0   1   Sample1
-2   0   0   2   Sample2
+##PEDNG v1.0
+##I_ID	F	M	S	S_ID
+1   .   .   1   Sample1
+2   .   .   2   Sample2
 3   1   2   2   Sample3
 ```
 
