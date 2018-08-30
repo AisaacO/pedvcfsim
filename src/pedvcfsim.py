@@ -325,44 +325,66 @@ if __name__ == '__main__':
         epilog=examples, formatter_class=argparse.RawDescriptionHelpFormatter)
     optional = parser._action_groups.pop()
     required = parser.add_argument_group('required arguments')
-    required.add_argument('-i', '--input', type=pf.valid_extension,
-                          help='input file in ped format. Must end with .ped',
+    required.add_argument('-i', '--input',
+                          type=pf.valid_extension,
+                          help='input file in ped format.'
+                          ' Must end with .ped',
                           required=True)
-    required.add_argument('-t', '--theta', type=float, default=0.001,
-                                help='Controls meiosis simulation'
-                                ' [default: %(default)3f]', required=True)
-    required.add_argument('-n', '--num_sim', type=int, default=1000,
-                                help='Number of simulations'
-                                ' [default: %(default)d]', required=True)
+    required.add_argument('-t', '--theta',
+                          type=float, default=0.001,
+                          help='Controls meiosis simulation'
+                          ' [default: %(default)3f]',
+                          required=True)
+    required.add_argument('-n', '--num_sim',
+                          type=int,
+                          default=1000,
+                          help='Number of simulations'
+                          ' [default: %(default)d]',
+                          required=True)
     required.add_argument('-m', '--mutate_node',
-                                help='Child node to be mutated', required=True)
-    required.add_argument('-e', '--error_rate', type=float, nargs='?',
-                                help='Simulation Error rate', required=False)
-    required.add_argument('-c', '--coverage', type=int, nargs=2,
-                                help='Coverage of sequences', required=False)
-    optional.add_argument('-a', '--mut_allele', type=int, choices=range(1, 3),
-                          default=2, help='Mutate allele in child node. 1 for'
-                          'Paternal or 2 for maternal allele'
-                          ' [default: %(default)s]', required=False)
-    optional.add_argument('-o', '--output', type=pf.valid_output,
-                                help='Output file name with vcf extension'
-                                '[default: %(default)s]', default="result.vcf")
-    optional.add_argument(
-        '-v',
-        '--version',
-        action='version',
-        version='%(prog)s 2.0',
-        help='output version details')
-    optional.add_argument('-V', '--verbose', action="store_true",
-                                help='Increased simulation verbosity',
-                                required=False)
-    optional.add_argument('-s', '--seed', type=int, dest="seed",
-                                help='Random seed for simulation run',
-                                required=False)
-    optional.add_argument('-z', '--zygosity', action='append', nargs=3,
-                                help='Specifies zygosity of twin children if'
-                                ' any. 1 for Monozygotic or 2 for Dizygotic'
-                                ' [default: %(default)s]', required=False)
+                          help='Child node to be mutated',
+                          required=True)
+    required.add_argument('-e', '--error_rate',
+                          type=float, nargs='?',
+                          help='Simulation Error rate',
+                          required=False)
+    required.add_argument('-c', '--coverage',
+                          type=int,
+                          nargs=2,
+                          help='Coverage of sequences',
+                          required=False)
+    optional.add_argument('-a', '--mut_allele',
+                          type=int, choices=range(1, 3),
+                          default=2,
+                          help='Mutate allele in child node.'
+                          ' 1 for Paternal allele or'
+                          ' 2 for maternal allele'
+                          ' [default: %(default)s]',
+                          required=False)
+    optional.add_argument('-o', '--output',
+                          type=pf.valid_output,
+                          default="result.vcf",
+                          help='Output file name with vcf extension'
+                          '[default: %(default)s]',
+                          required = False)
+    optional.add_argument('-v','--version',
+                          action='version',
+                          version='%(prog)s 1.0.1',
+                          help='output version details')
+    optional.add_argument('-V', '--verbose',
+                          action="store_true",
+                          help='Increased simulation verbosity',
+                          required=False)
+    optional.add_argument('-s', '--seed',
+                          type=int, dest="seed",
+                          help='Random seed for simulation run',
+                          required=False)
+    optional.add_argument('-z', '--zygosity',
+                          action='append', nargs=3,
+                          help='Specifies zygosity of twin children if'
+                          ' any. 1 for Monozygotic or 2 for Dizygotic'
+                          ' [default: %(default)s]',
+                          required=False)
     parser._action_groups.append(optional)
     try:
         args = parser.parse_args()
