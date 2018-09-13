@@ -1,4 +1,5 @@
-I	F	M	S	Sa
-1	0	0	1	A	B
-2	0	0	2	C	D
+##PEDNG v1.0
+##I_ID	F	M	S	Sa
+1	.	.	1	A	B
+2	. .	2	C	D
 3	1	2	1	E	F
