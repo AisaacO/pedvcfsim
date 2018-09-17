@@ -21,6 +21,7 @@ def main():
     args = parse_args(sys.argv[1:])
     try:
         verify = checkargs(args)
+        print(verify)
     except Exception:
         print(verify)
         sys.exit()
