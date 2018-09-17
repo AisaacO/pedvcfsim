@@ -1,7 +1,6 @@
 <p align="center"><img width=12.5% src="https://github.com/AisaacO/pedvcfsim/blob/master/images/logo.png"></p>
 <p align="center"><img width=40% height=5% src="https://github.com/AisaacO/pedvcfsim/blob/master/images/words.png"></p>
 Simulate Variant Call Format (VCF) file from pedigree or graph like data using a finite table Chinese restaurant process.
-The simulation follows a descrete time stochastic finite mixture model similar to seating customers in a Chinese restaurant. Tables in the process are restricted to 4, corresponding to the bases ```'A', 'G', 'C', 'T'.``` 
 
 
 ----
@@ -38,9 +37,9 @@ To use pedvcfsim, you can either clone or download by:
 
 ```pedtovcfsim``` requires a 5-column, tab-separated pedigree file format as input
 ```
-I_ID	F	M	S	S_ID
-1   0   0   1   Sample1
-2   0   0   2   Sample2
+##PEDNG v1.0
+##I_ID	F	M	S	S_ID
+2   .   .   2   Sample2
 3   1   2   2   Sample3
 ```
 
