@@ -1,0 +1,13 @@
+##fileformat=VCFv4.2
+##phasing=partial
+##contig=<ID=1,length = 5>
+##vcfsimCommands = -i trio.ped -t 0.001 -n 5 -e 0.005 -c [20, 20] -m Sam -a 1 -z [['2', 'Sam', 'Adam']] -s 1537214392 -o rest.vcf
+##FILTER=<ID=PASS,Description = "All filters passed" > 
+##FORMAT=<ID=GT,Number = 1,Type=String,Description = 
+##FORMAT=<ID=AD,Number = R,Type=Integer,Description = 
+##vcfsimVersion = v0.0.1#CHROM	POS	ID	REF	ALT	QUAL	FILTER	INFO	FORMAT	John	Mary	Sam	Adam	A	B	C	D
+1	1	.	G	T	.	PASS	.	GT :AD	0|0:.	0|0:.	1|0:.	0|0:.	0|0:20,0	0|0:20,0	1|0:11,9	0|0:20,0
+1	2	.	G	T	.	PASS	.	GT :AD	0|0:.	0|0:.	1|0:.	0|0:.	0|0:20,0	0|0:20,0	1|0:12,8	0|0:20,0
+1	3	.	A	G	.	PASS	.	GT :AD	0|0:.	0|0:.	1|0:.	0|0:.	0|0:20,0	0|0:20,0	1|0:10,10	0|0:20,0
+1	4	.	G	T,A	.	PASS	.	GT :AD	0|0:.	0|0:.	1|0:.	0|0:.	0|0:20,0,0	0|0:19,0,1	1|0:3,17,0	0|0:20,0,0
+1	5	.	A	C	.	PASS	.	GT :AD	0|0:.	0|0:.	1|0:.	0|0:.	0|0:20,0	0|0:20,0	1|0:6,14	0|0:20,0
