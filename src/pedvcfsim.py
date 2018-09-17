@@ -16,11 +16,14 @@ import tqdm
 
 
 def main():
-    '''
-        Get all arguments provided by the user, check validity of
-        arguments, file format, file content and writes results
-        to an output file specified by user or uses default output
-    '''
+    
+
+    args = parse_args(sys.argv[1:])
+    try:
+        verify = checkargs(args)
+    except Exception:
+        print(verify)
+        sys.exit()
     all_input = vars(args)
     n = args.num_sim
     bases = [0, 1, 2, 3]
@@ -84,28 +87,12 @@ def main():
     else:
         print("Node to be mutated is a child node. Proceeding!")
     if args.output:
-        with open(args.output, 'w') as f:
-            l1 = "##fileformat=VCFv4.2"
-            l2 = "##phasing=partial"
-            l3 = "##contig=<ID=1,length = " + str(args.num_sim) + ">"
-            l4 = "##vcfsimCommands = -i " + str(args.input) + " -t " + str(
-                args.theta) + " -n " + str(args.num_sim) + " -e " + str(
-                args.error_rate) + " -c " + str(
-                args.coverage) + " -m " + str(args.mutate_node) + " -a " + str(
-                args.mut_allele) + " -z " + str(zygosity) + " -s " + str(
-                args.seed) + " -o " + str(args.output)
-            l5 = "##FILTER=<ID=PASS,Description = "'"All filters passed"'" > "
-            l6 = "##FORMAT=<ID=GT,Number = 1,Type=String,Description = "
-            '"Genotype"'" > "
-            l7 = "##FORMAT=<ID=AD,Number = R,Type=Integer,Description = "
-            '"Allelic depths for the ref and alt alleles in listed order"'">"
-            l8 = "##vcfsimVersion = v0.0.1"
-            f.write(
-                "%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n" %
-                (l1, l2, l3, l4, l5, l6, l7, l8))
-            head = (
+        with open(args.output, 'w') as vcf:
+            header_one = first_header(args, zygosity)
+            vcf.write(f"{chr(10).join(header_one)}")
+            header_two = (
              "#CHROM\tPOS\tID\tREF\tALT\tQUAL\tFILTER\tINFO\tFORMAT\t" + sname)
-            f.write("%s\n" % (head))
+            vcf.write("%s\n" % (header_two))
             counter = 1
             count = 0
             for x in tqdm.tqdm(range(n), total=len(range(n))):
@@ -117,8 +104,8 @@ def main():
                     check if zygosity is given and if value = 1, the genotypes
                     of the individuals will be the same (always conform to
                     mutated node if its one of the monozygote
-                    twins). If value = 2, the genotypes are different (treated
-                    as different individuals).
+                    twins). If value = 2, the genotypes are different (
+                    dizygotes treated as different individuals).
                 '''
                 try:
                     if args.zygosity:
@@ -297,25 +284,101 @@ def main():
                 gtad_maps = '\t'.join(mappings)
                 gtad_soma = '\t'.join(g_soma)
                 last_gtad = "\t".join([gtad_soma, gtad_maps])
-                f.write("%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n" % (str(
+                vcf.write("%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n" % (str(
                     counter), str(count), str("."), reference, final_alts, str(
                         "."), str("PASS"), str("."), str("GT" + " :AD"), str(
                                 last_gtad)))
-                pass
+#                pass
         print("Results have been written to ", args.output)
 
 
-if __name__ == '__main__':
+def checkargs(args):
+    
+    '''
+        Get all arguments provided by the user, check validity of
+        arguments, file format, file content and writes results
+        to an output file specified by user or uses default output
+    '''    
 
-    """ Gets input from user through command line.
-        By using argparse, values entered are automatically
-        checked against the required types before simulation is started.
-    """
-    print("*******************************************")
-    print("\tBegin \033[0;33mpedvcfsim.py\033[0;m(v1.0.1)")
-    print("\tLast updated: August 19, 2018.")
-    print("\tRequires running python 3!\n")
-    print("*******************************************")
+    try:
+        
+        if args.seed:
+            pass
+        else:
+            args.seed = int(time.time())
+        if sys.argv[1] == 1:
+            print(help)
+            sys.exit()
+        else:
+            print("Checking user entries...")
+        if len(sys.argv) < 6:
+            print("\t> ERROR: Incorrect number of arguments!",
+                  len(sys.argv), "! at least 6 required.")
+            print(help)
+            sys.exit()
+        else:
+            print("Commands for this simulation includes:")
+            for arg in vars(args):
+                print("\t", arg, getattr(args, arg))
+            print("Entries >OK! Proceeding...")
+            print("Checking", args.input, "file exist...")
+        if not os.path.exists(args.input):
+            print("ERROR - File not found! Please check your path/filename")
+            sys.exit()
+        else:
+            print("File found !!! ")
+            print("Validating file contents...")
+        if os.stat(args.input).st_size == 0:
+            print("File", args.input, "is empty, please check the file!")
+            sys.exit()
+        else:
+            num_cols = 5
+            with open(args.input, 'r') as pedin:
+                if all(col.count('\t') < num_cols - 1 for col in pedin):
+                    print(
+                        "\t",
+                        args.input,
+                        "should contain at least 5 columns. Exiting...")
+                    sys.exit()
+                else:
+                    print(args.input, "is tab separated. Proceeding!")
+        if args.zygosity is not None and len(args.zygosity) not in (0, 3):
+            args.zygosity
+        else:
+            args.zygosity = None
+        
+    except KeyboardInterrupt:
+        sys.exit(1)
+
+        
+def first_header(args, zygosity):
+
+    '''
+    Write vcf header to file. This includes the user supplied input values 
+    for the simulation run
+    '''
+    l1 = "##fileformat=VCFv4.2"
+    l2 = "##phasing=partial"
+    l3 = "##contig=<ID=1,length = " + str(args.num_sim) + ">"
+    l4 = "##vcfsimCommands = -i " + str(args.input) + " -t " + str(
+        args.theta) + " -n " + str(args.num_sim) + " -e " + str(
+        args.error_rate) + " -c " + str(
+        args.coverage) + " -m " + str(args.mutate_node) + " -a " + str(
+        args.mut_allele) + " -z " + str(zygosity) + " -s " + str(
+        args.seed) + " -o " + str(args.output)
+    l5 = "##FILTER=<ID=PASS,Description = "'"All filters passed"'" > "
+    l6 = "##FORMAT=<ID=GT,Number = 1,Type=String,Description = "
+    '"Genotype"'" > "
+    l7 = "##FORMAT=<ID=AD,Number = R,Type=Integer,Description = "
+    '"Allelic depths for the ref and alt alleles in listed order"'">"
+    l8 = "##vcfsimVersion = v0.0.1"
+    header_one = [l1, l2, l3, l4, l5, l6, l7, l8]
+    return header_one
+
+    
+def parse_args(args):
+    
+    #Parse the command line arguments to the program
     examples = '''example:
     [python] [vcfsim.py] [input.ped] [theta] [No of simulations]
     [node with mutation] [output]
@@ -346,13 +409,13 @@ if __name__ == '__main__':
                           required=True)
     required.add_argument('-e', '--error_rate',
                           type=float, nargs='?',
-                          help='Simulation Error rate',
-                          required=False)
+                          help='Genotype Error rate',
+                          required= True)
     required.add_argument('-c', '--coverage',
                           type=int,
                           nargs=2,
                           help='Coverage of sequences',
-                          required=False)
+                          required=True)
     optional.add_argument('-a', '--mut_allele',
                           type=int, choices=range(1, 3),
                           default=2,
@@ -386,53 +449,16 @@ if __name__ == '__main__':
                           ' [default: %(default)s]',
                           required=False)
     parser._action_groups.append(optional)
-    try:
-        args = parser.parse_args()
-        if not args.seed:
-            args.seed = int(time.time())
-        else:
-            args.seed
-        if sys.argv[1] == 1:
-            print(help)
-            sys.exit()
-        else:
-            print("Checking user entries...")
-            if len(sys.argv) < 6:
-                print("\t> ERROR: Incorrect number of arguments!",
-                      len(sys.argv), "! at least 6 required.")
-                print(help)
-                sys.stderr.flush()
-                sys.exit()
-            else:
-                print("Commands for this simulation includes:")
-                for arg in vars(args):
-                    print("\t", arg, getattr(args, arg))
-                print("Entries >OK! Proceeding...")
-                print("Checking", args.input, "file exist...")
-        if not os.path.exists(args.input):
-            print("ERROR - File not found! Please check your path/filename")
-            sys.exit()
-        else:
-            print("File found !!! ")
-            print("Validating file contents...")
-        if os.stat(args.input).st_size == 0:
-            print("File", args.input, "is empty, please check the file!")
-            sys.exit()
-        else:
-            num_cols = 5
-            with open(args.input, 'r') as pedin:
-                if all(col.count('\t') < num_cols - 1 for col in pedin):
-                    print(
-                        "\t",
-                        args.input,
-                        "should contain 5 tabbed columns at least. Exiting...")
-                    sys.exit()
-                else:
-                    print(args.input, "is tab separated. Proceeding!")
-        if args.zygosity is not None and len(args.zygosity) not in (0, 3):
-            args.zygosity
-        else:
-            args.zygosity = None
-        main()
-    except KeyboardInterrupt:
-        sys.exit(1)
+    return parser.parse_args(args)
+
+if __name__ == '__main__':
+    
+    print("*******************************************")
+    print("\tBegin \033[0;33mpedvcfsim.py\033[0;m(v1.0.1)")
+    print("\tLast updated: August 19, 2018.")
+    print("\tRequires running python 3!\n")
+    print("*******************************************")
+
+    main()
+
+
