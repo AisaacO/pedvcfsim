@@ -13,6 +13,7 @@ import gen_error as gn
 from gt_founders import run
 from gt_mapping2 import ggcode
 import tqdm
+from collections import OrderedDict, defaultdict
 
 '''
       Applies the chinese restaurant model to model alleles based on graph-like
@@ -182,7 +183,6 @@ def main():
                 final_vals_based_on_error = []
                 calculated_error_rates = []
                 go = sites*numb_samples
-                print(coding)
                 for i in coding:
                     if i not in heterozygous.index:
                         gt_error = homozygous.loc[[i]]
