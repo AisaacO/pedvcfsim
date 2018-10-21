@@ -61,7 +61,9 @@ Fifth column = Sample ID
 
 ```Assign values based on how much coverage you want for founders or parents in your pedigree vs offsprings. If there are more than one (1) samples in your file, the coverage is equally shared among your samples. 
 ```
+
 For example:
+
 Number of parents = 2, Coverage = 20X, Each parent gets 10X
 Number of children = 2, Coverage = 40X, Each child gets 20X
 Number of parents = 2, Number of samples = 2, Coverage = 20X, Each parent gets 5X, Each samples gets 5X
@@ -74,11 +76,14 @@ Number of children = 2, Number of samples = 2, Coverage = 40X, Each child gets 1
 
 ```Assign values based on zygosity type if twins occur in the pedigree. Three (3) values are assigned to z
 ```
+
 For example:
+
+
 If the twins are Monozygotes, z starts with 1 but if Dizygotes, z starts with 2
 Next, provide values for the twins:
 Values can be strings (names of the twins), integers (values for the twins) or combined string and integer twin names
-Example
+
 Monozygotes: -z 1 A B or -z 1 3 4 or -z 1 A 4
 Dizygotes:   -z 2 A B or -z 2 2 4 or -z 2 B 4
 
