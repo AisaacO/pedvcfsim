@@ -65,7 +65,9 @@ For example:
 
 Number of parents = 2, Coverage = 20X, Each parent gets 10X
 Number of children = 2, Coverage = 40X, Each child gets 20X
+
 Number of parents = 2, Number of samples = 2, Coverage = 20X, Each parent gets 5X, Each samples gets 5X
+
 Number of children = 2, Number of samples = 2, Coverage = 40X, Each child gets 10X, Each sample gets 10X
 
 
