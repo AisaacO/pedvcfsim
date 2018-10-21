@@ -14,6 +14,14 @@ from gt_founders import run
 from gt_mapping2 import ggcode
 import tqdm
 
+'''
+      Applies the chinese restaurant model to model alleles based on graph-like
+      or pedigree data. Further simulates allele mutation based on user input
+      and generates a VCF output containing the simulated variants. Pedvcfsim
+      can also work with twin data.
+      
+'''
+
 
 def main():
     
@@ -48,7 +56,6 @@ def main():
     except IndexError:
         individuals = [i for i in sites_lists]
     num_sites = list(range(1, len(sites_lists) + 1))
-#    print(num_sites)
     ind_index_dict = {
         l1: l2 for l1,
         l2 in itertools.zip_longest(
@@ -71,12 +78,22 @@ def main():
     sam_name = individuals
     sample_gl = [str(s) for s in sam_name]
     sample_lb = [s for s in sample_lists]
-    sam_name = sample_gl + sample_lb
-    sam_list = pf.removebrackets(sam_name)
+    l = [i[0] for i in sample_lb]
+    l2 = [i[1:] for i in sample_lb if i in sample_lb != None]
+    sam_list = pf.removebrackets(sample_gl + l + l2)
+    list_of_samples = pf.removebrackets(l + l2)
     sname = (sam_list.replace(", ", "\t")).translate(
         str.maketrans({"'": None}))
     input_data = [tuple(l) for l in sites]
     cNodes = list((i[0] for i in input_data if 0 not in i))
+    pNodes = list((i[0] for i in input_data if 0 in i))
+    total_length = len(cNodes) + len(pNodes)
+    total_samples = sum([len(i) for i in sample_lb])
+    numb_samples = int(total_samples /(len(pNodes) + len(cNodes)))
+    sum_founders = (total_samples/total_length)* len(pNodes)
+    sum_children = (total_samples/total_length)* len(cNodes)
+    actual_founder_coverage = int(cov[0]/sum_founders)
+    actual_children_coverage = int(cov[1]/sum_children)
     if mutnode not in cNodes:
         print(
             "Node",
@@ -89,53 +106,57 @@ def main():
     if args.output:
         with open(args.output, 'w') as vcf:
             header_one = first_header(args, zygosity)
-            vcf.write(f"{chr(10).join(header_one)}")
-            header_two = (
-             "#CHROM\tPOS\tID\tREF\tALT\tQUAL\tFILTER\tINFO\tFORMAT\t" + sname)
-            vcf.write("%s\n" % (header_two))
+            vcf.write(f"{chr(10).join(header_one)}\n")
+            header_two = ("#CHROM\tPOS\tID\tREF\tALT\tQUAL\tFILTER\tINFO\tFORMAT\t" + sname)
+            vcf.write("%s\n"% (header_two))
             counter = 1
             count = 0
             for x in tqdm.tqdm(range(n), total=len(range(n))):
                 count += 1
                 # get values from the function (run)
-                ref, node_values, coding = run(
+                ref, node_values, all_coding = run(
                     input_data, bases, theta, mutnode, mutate)
                 '''
-                    check if zygosity is given and if value = 1, the genotypes
+                    checks if zygosity is given and if value = 1, the genotypes
                     of the individuals will be the same (always conform to
                     mutated node if its one of the monozygote
                     twins). If value = 2, the genotypes are different (
                     dizygotes treated as different individuals).
                 '''
+                coding = all_coding* 2
                 try:
                     if args.zygosity:
-                        zygo = [item for s in args.zygosity for item in s]
+                        coding = all_coding
+                        zygo = [item for s in zygosity for item in s]
                         for i, j in enumerate(node_values.keys()):
                             for k, x in enumerate(individuals):
-                                if (k == i and x == zygo[2] and
-                                        k == mutnode and zygo[0] == str(1)):
-                                    node_values[k + 1] = (
-                                            node_values.get(mutnode))
+                                if (k == i and x == zygo[2] and k == mutnode and zygo[0] == str(1)):
+                                    node_values[k + 1] = (node_values.get(mutnode))
                                     cod = dict(enumerate(coding))
                                     for q, s in enumerate(coding):
                                         if q == k:
                                             coding[q] = cod.get(q-1)
+                                            coding = coding*numb_samples
                                 if zygo[0] == str(2):
                                     pass
                 except Exception:
                     pass
                 alt, code, inner_node = ggcode(node_values, ref)
+                coding = all_coding*numb_samples
                 readers = pf.read_csv(args.input)
                 rowss = list(readers)
                 rowss_as_strings = [row for row in rowss[0:]]
-                rowss_dict = dict()
+                rowss2_dict = dict()
                 for i in rowss_as_strings:
                     key = i[0]
                     val = i[4:]
-                    rowss_dict[key] = val
+                    rowss2_dict[key] = val
+                rowss_dict = OrderedDict({k: v for k, v in rowss2_dict.items() if '#' not in k}) 
+                ind= {k:i for i,k in enumerate(rowss_dict.keys())}
+                inner_dict = dict()
                 for key, val in rowss_dict.items():
                     for i, x in enumerate(coding):
-                        if key == i + 1:
+                        if ind[key] == i + 1:
                             rowss_dict[key] = [x for y in val]
                 inner_dict = dict()
                 for k, v in rowss_dict.items():
@@ -157,28 +178,30 @@ def main():
                 ref_val = pf.convert_to_string(ref)
                 ref_string = pf.removebrackets(ref_val)
                 reference = str(ref_string)
-                het, hom = gn.gen_err(e)
+                heterozygous, homozygous = gn.gen_err(e)
                 final_vals_based_on_error = []
                 calculated_error_rates = []
+                go = sites*numb_samples
+                print(coding)
                 for i in coding:
-                    if i not in het.index:
-                        gt_error = hom.loc[[i]]
+                    if i not in heterozygous.index:
+                        gt_error = homozygous.loc[[i]]
                         calculated_error_rates.append(gt_error.values.tolist())
                     else:
-                        gt_error = het.loc[[i]]
+                        gt_error = heterozygous.loc[[i]]
                         calculated_error_rates.append(gt_error.values.tolist())
+
+                data_dict = list(zip([i[0] for i in go], coding))
+                data_dict = dict(i for i in enumerate(data_dict))
                 for z, i in enumerate(calculated_error_rates):
                     val_based_on_applied_error = []
-                    if not (z + 1) in cNodes:
-                        apply_error_rate = np.random.multinomial(
-                            cov[0], i[0], size=1)
+                    if z in data_dict.keys() and coding[z] == data_dict.get(z)[1] and data_dict.get(z)[0] not in cNodes:
+                        apply_error_rate = np.random.multinomial(actual_founder_coverage, i[0], size=1)
                         val_based_on_applied_error.append(apply_error_rate)
-                    else:
-                        apply_error_rate = np.random.multinomial(
-                            cov[1], i[0], size=1)
+                    else:    
+                        apply_error_rate = np.random.multinomial(actual_children_coverage, i[0], size=1)
                         val_based_on_applied_error.append(apply_error_rate)
-                    final_vals_based_on_error.append(
-                        *val_based_on_applied_error)
+                    final_vals_based_on_error.append(*val_based_on_applied_error)
                 list_of_final_vals = np.array(
                     final_vals_based_on_error).tolist()
                 ad_rows = list(zip(*list_of_final_vals))
@@ -206,6 +229,8 @@ def main():
                     else:
                         pass
                 final_alts = ",".join(refalt[1:])
+                s_coded = code.split('\t')*numb_samples
+                code = '\t'.join(s_coded)
                 ddcode = re.split(r'\t+', code)
                 ddadcount = list(zip(ddcode, [str(a).replace(
                         ' ', '') for a in ads_and_errors]))
@@ -288,7 +313,6 @@ def main():
                     counter), str(count), str("."), reference, final_alts, str(
                         "."), str("PASS"), str("."), str("GT" + " :AD"), str(
                                 last_gtad)))
-#                pass
         print("Results have been written to ", args.output)
 
 
@@ -367,10 +391,8 @@ def first_header(args, zygosity):
         args.mut_allele) + " -z " + str(zygosity) + " -s " + str(
         args.seed) + " -o " + str(args.output)
     l5 = "##FILTER=<ID=PASS,Description = "'"All filters passed"'" > "
-    l6 = "##FORMAT=<ID=GT,Number = 1,Type=String,Description = "
-    '"Genotype"'" > "
-    l7 = "##FORMAT=<ID=AD,Number = R,Type=Integer,Description = "
-    '"Allelic depths for the ref and alt alleles in listed order"'">"
+    l6 = "##FORMAT=<ID=GT,Number = 1,Type=String,Description = " '"Genotype"'" > "
+    l7 = "##FORMAT=<ID=AD,Number = R,Type=Integer,Description = " '"Allelic depths for the ref and alt alleles in listed order"'">"
     l8 = "##vcfsimVersion = v0.0.1"
     header_one = [l1, l2, l3, l4, l5, l6, l7, l8]
     return header_one
